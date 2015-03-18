@@ -2,8 +2,9 @@
 !> A prototype solver for advection-diffusion-reaction equation,
 !> This equation is generic and intended for education purposes
 !> but may also serve as a starting point for more complex solvers.
+!> Developing Elasticity Solver for Electromigration (from ModelPDE)
 !------------------------------------------------------------------------------
-SUBROUTINE AdvDiffSolver( Model,Solver,dt,TransientSimulation )
+SUBROUTINE ElecMigrtnSolver( Model,Solver,dt,TransientSimulation )
 !------------------------------------------------------------------------------
 USE DefUtils
 IMPLICIT NONE
