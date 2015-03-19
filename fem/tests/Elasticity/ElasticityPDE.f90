@@ -3,7 +3,7 @@
 !> This equation is generic and intended for education purposes
 !> but may also serve as a starting point for more complex solvers.
 !> Developing Elasticity Solver for Electromigration (from ModelPDE)
-!> Anil Kunwar (Started on: 2015-03-19)
+!> Anil Kunwar (2015)
 !------------------------------------------------------------------------------
 SUBROUTINE ElecMigrtnSolver( Model,Solver,dt,TransientSimulation )
 !------------------------------------------------------------------------------
