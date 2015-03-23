@@ -2,6 +2,8 @@
 !> A prototype solver for advection-diffusion-reaction equation,
 !> This equation is generic and intended for education purposes
 !> but may also serve as a starting point for more complex solvers.
+!> Turing equation developed from ModelPDE solver
+!> Anil Kunwar(2015)
 !------------------------------------------------------------------------------
 SUBROUTINE AdvDiffSolver( Model,Solver,dt,TransientSimulation )
 !------------------------------------------------------------------------------
