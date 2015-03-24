@@ -67,7 +67,7 @@ SUBROUTINE LocalMatrix( Element, n, nd )
 INTEGER :: n, nd
 TYPE(Element_t), POINTER :: Element
 !------------------------------------------------------------------------------
-REAL(KIND=dp) :: backstress_coeff(n),conv_coeff(n),electromigration_coeff(n), &
+REAL(KIND=dp) :: stress_coeff(n),conv_coeff(n),electromigration_coeff(n), &
 time_coeff(n),alpha, beta,C,gamma, Velo(3,n),a(3), Weight
 REAL(KIND=dp) :: Basis(nd),dBasisdx(nd,3),DetJ,LoadAtIP
 REAL(KIND=dp) :: MASS(nd,nd), STIFF(nd,nd), FORCE(nd), LOAD(n)
@@ -88,7 +88,7 @@ BodyForce => GetBodyForce()
 IF ( ASSOCIATED(BodyForce) ) &
 Load(1:n) = GetReal( BodyForce,'field source', Found )
 Material => GetMaterial()
-backstress_coeff(1:n)=GetReal(Material,'Coefficient of BackStress',Found)
+stress_coeff(1:n)=GetReal(Material,'Coefficient of Stress',Found)
 electromigration_coeff(1:n)=GetReal(Material,'Coefficient of Electromigration',Found)
 conv_coeff(1:n)=GetReal(Material,'Coefficient of Convection Term',Found)
 time_coeff(1:n)=GetReal(Material,'Coefficient of Transient Term',Found)
@@ -110,26 +110,26 @@ IP % W(t), detJ, Basis, dBasisdx )
 LoadAtIP = SUM( Basis(1:n) * LOAD(1:n) )
 alpha = SUM(Basis(1:n)*time_coeff(1:n))
 a = MATMUL(Velo(:,1:n),Basis(1:n))
-beta = SUM(Basis(1:n)*backstress_coeff(1:n))
+beta = SUM(Basis(1:n)*stress_coeff(1:n))
 C = SUM(Basis(1:n)*conv_coeff(1:n))
 gamma = SUM(Basis(1:n)*electromigration_coeff(1:n))
 Weight = IP % s(t) * DetJ
 ! diffusion term (D*grad(u),grad(v)):
 ! -----------------------------------
 STIFF(1:nd,1:nd) = STIFF(1:nd,1:nd) + Weight * &
-D * MATMUL( dBasisdx, TRANSPOSE( dBasisdx ) )
+beta * MATMUL( dBasisdx, TRANSPOSE( dBasisdx ) )
 DO p=1,nd
 DO q=1,nd
 ! advection term (C*grad(u),v)
 ! -----------------------------------
-STIFF (p,q) = STIFF(p,q) + Weight * &
-C * SUM(a(1:dim)*dBasisdx(q,1:dim)) * Basis(p)
+!STIFF (p,q) = STIFF(p,q) + Weight * &
+!C * SUM(a(1:dim)*dBasisdx(q,1:dim)) * Basis(p)
 ! reaction term (R*u,v)
 ! -----------------------------------
-STIFF(p,q) = STIFF(p,q) + Weight * R*Basis(q) * Basis(p)
+STIFF(p,q) = STIFF(p,q) + Weight * gamma*Basis(q) * Basis(p)
 ! time derivative (rho*du/dt,v):
 ! ------------------------------
-MASS(p,q) = MASS(p,q) + Weight * rho * Basis(q) * Basis(p)
+MASS(p,q) = MASS(p,q) + Weight * alpha * Basis(q) * Basis(p)
 END DO
 END DO
 FORCE(1:nd) = FORCE(1:nd) + Weight * LoadAtIP * Basis(1:nd)
