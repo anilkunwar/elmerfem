@@ -1,0 +1,116 @@
+Header
+  CHECK KEYWORDS Warn
+  Mesh DB "." "Mesh_1"
+  Include Path ""
+  Results Directory ""
+End
+
+Simulation
+  Max Output Level = 32
+  Coordinate System = Cartesian
+  Coordinate Mapping(3) = 1 2 3
+  Simulation Type = Steady state
+  Steady State Max Iterations = 1
+  Output Intervals = 1
+  Timestepping Method = BDF
+  BDF Order = 1
+  Solver Input File = case.sif
+  Post File = case.vtu
+End
+
+Constants
+  Gravity(4) = 0 -1 0 9.82
+  Stefan Boltzmann = 5.67e-08
+  Permittivity of Vacuum = 8.8542e-12
+  Boltzmann Constant = 1.3807e-23
+  Unit Charge = 1.602e-19
+End
+
+Body 1
+  Target Bodies(1) = 1
+  Name = "Body Property 1"
+  Equation = 1
+  Material = 1
+End
+
+Body 2
+  Target Bodies(1) = 2
+  Name = "Body Property 2"
+  Equation = 1
+  Material = 1
+End
+
+Solver 1
+  Equation = Linear elasticity
+  Procedure = "StressSolve" "StressSolver"
+  Calculate Stresses = True
+  Calculate Strains = True
+
+!  Element = p:2 
+
+  Variable = -dofs 2 Displacement
+  Calculate Loads = True
+  Stabilize = True
+  Bubbles = False
+  Lumped Mass Matrix = False
+  Optimize Bandwidth = True
+  Steady State Convergence Tolerance = 1.0e-5
+  Nonlinear System Convergence Tolerance = 1.0e-8
+  Nonlinear System Max Iterations = 20
+  Nonlinear System Newton After Iterations = 3
+  Nonlinear System Newton After Tolerance = 1.0e-3
+  Nonlinear System Relaxation Factor = 1
+  Linear System Solver = Direct
+  Linear System Direct Method = Umfpack
+End
+
+
+! Additional solver for the postprocessing part
+Solver 2
+  Equation = Jintegral
+  Procedure = "Jintegral" "Jintegral"
+  Exec Solver = After Simulation
+End
+
+Equation 1
+  Name = "Equation 1"
+  Plane Stress = True
+  Calculate Stresses = True
+  Active Solvers(1) = 1
+End
+
+Material 1
+  Name = "Material 1"
+  Density = 7850
+  Poisson ratio = 0.3
+  Youngs modulus = 2.06e11
+End
+
+Boundary Condition 1
+  Target Boundaries(3) = 5 10 11  
+  Name = "Crack"
+  Displacement 3 = 0.0
+  Displacement 2 = 0.0
+  Displacement 1 = 0.0
+End
+
+Boundary Condition 2
+  Target Boundaries(2) = 2 12
+  Name = "Bottom"
+  Displacement 3 = 0.0
+  Displacement 2 = 0.0
+  Displacement 1 = 0.0
+End
+
+Boundary Condition 3
+  Target Boundaries(1) = 14
+  Name = "Top"
+  Normal Force = 2e6
+End
+
+
+Boundary Condition 4
+  Target Boundaries(7) = 3 4  7 8 9 12 13
+  Name = "J integral"
+  J Integral = Logical True
+End 
