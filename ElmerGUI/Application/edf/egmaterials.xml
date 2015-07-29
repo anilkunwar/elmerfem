@@ -279,5 +279,12 @@
     <parameter name="Relative Permittivity" >3.75</parameter>
     <parameter name="Melting Point" >1956.0</parameter>
   </material>
+  
+  <material name="Balsa Wood (25 C)" >
+   <parameter name="Density" >160</parameter>
+   <parameter name="Heat expansion coeff." >1.6e-7</parameter>
+    <parameter name="Heat conductivity" >0.048</parameter>
+    <parameter name="Heat capacity" >450.0</parameter>
+  </material>
  
 </materiallibrary>
