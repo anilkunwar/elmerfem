@@ -1,0 +1,9 @@
+! ----- names for bodies -----
+$ body7 = 1
+! ----- names for boundaries -----
+$ Group_Bottom = 1
+$ Group_1BFS = 2
+$ Group_Right = 3
+$ Group_Top = 4
+$ Group_1TFS = 5
+$ Group_1IF = 6
