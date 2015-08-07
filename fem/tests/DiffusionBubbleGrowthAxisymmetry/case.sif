@@ -1,0 +1,316 @@
+!-----------------------------------------------------------------
+! This is a simple case demonstrating how diffusion limited growth 
+! could increase (or decrease) the size of an air bubble in fluid.
+! 
+! The motivation for the case arose from the lengthy and repeated
+! discussion on this kind of growth at the Elmer discussion forum.
+! This case should now provide a solution for the shape deformation
+! with quite significant deformation fields.
+!
+! Actually as the shape of the bubble may freely change the size
+! of the bubble and the evolution of the shape could be split into
+! two separate problems. Without any external forces the shape of 
+! bubble should be perfect sphere. 
+!
+! Written By:Peter Råback / 10.1.2014 & 2.4.2014
+! Few Additional Workouts by: Anil Kunwar 
+!----------------------------------------------------------------
+
+
+Check Keywords Warn
+
+Header
+  Mesh DB "." "Mesh_1"
+End
+
+! Total integration time
+$ tottime = 120
+
+! Total number of timesteps
+$ nsteps = 60
+
+! mass transfer coeffient is related to the rate at which 
+! oxygen can penetrate to the bubble. If this is diffusion
+! limited groth. The BC could be replaced by Dirichlet condition.
+!$mtcoeff = 1.0e3    !Surface Renewal Theory
+
+! External concentration of the air at infinity. 
+$ extcons = 0.1024                           !Find the appropriate concentration value
+
+! Equilibrium concentration of the bubble.
+! If this is larger than the external consentration the bubble 
+! gets smaller, and if bigger, then it gets large, correspondingly. 
+!$equilcons = 0.5   !From Gibbs free energy
+
+! This coefficient translates the oxygen diffusive flux
+! to volume flux of the bubble. The user should determine 
+! this coefficient himself and tune the time-scale accordingly. 
+$ growthcoeff = 5.0e-6
+
+
+Simulation
+  Coordinate System = Axi Symmetric
+  Coordinate Scaling = 1.0e-6
+
+  Simulation Type = "Transient"
+  Steady State Max Iterations = 1
+
+  Timestep Intervals = $ nsteps
+  Timestep Sizes = $ tottime/nsteps
+
+  Output Intervals = 1
+  Timestepping Method = BDF
+  BDF Order = 1
+
+  Post File = "ver_b.vtu"
+  Initialize Dirichlet Conditions = Logical False
+
+  Max Output Level = 32
+End
+
+
+Constants
+End
+
+Body 1
+  Name = "Fluid"
+  Equation = 1
+  Material = 1
+  Initial Condition = 1
+End
+
+Body 2
+  Name = "Bubble"
+  Equation = 2
+  Material = 2
+  Initial Condition = 1
+End
+
+Body 3
+  Name = "Interface"
+  Equation = 3
+  Material = 1
+  Initial Condition = 1 
+End
+
+Equation 1
+  Name = "Diffusion and MeshUpdate"
+  Active Solvers(2) = 2 3
+  Concentration Units = String "absolute mass"
+End
+
+Equation 2
+  Name = "Just MeshUpdate"
+  Active Solvers(1) = 2
+End 
+
+Equation 3
+  Name = "Just Normals"
+  Active Solvers(1) = 4
+End 
+
+Initial Condition 1
+  Name = "Initial State"
+  Gas = Real $ extcons
+End 
+
+
+
+Solver 1
+  Equation = "ComputeFlux"
+  Procedure = File "SaveData" "SaveScalars"
+
+  Variable 1 = Gas loads
+  Operator 1 = boundary sum
+  Target Variable 1 = String "totflux"
+
+  Operator 2 = area
+  Target Variable 2 = String "totarea"
+
+  Variable 3 = Gas
+  Operator 3 = min
+  Operator 4 = max
+
+  Variable 5 = MeshU 1
+  Operator 5 = min
+  Operator 6 = max
+
+  Variable 7 = MeshU 2
+  Operator 7 = min
+  Operator 8 = max
+
+  Variable 9 = Gas
+  Operator 9 = boundary int mean
+
+  Filename = fb.dat
+End
+
+
+
+Solver 2
+  Equation = "MeshU"
+  Procedure = File "NonphysicalMeshSolve" "MeshSolver"
+  Variable = MeshU[MeshU:2]
+
+  Linear System Solver = Iterative
+  Linear System Iterative Method = BiCGStab
+  Linear System Preconditioning = ILU0
+  Linear System Max Iterations = 1000
+  Linear System Residual Output = 20
+  Linear System Convergence Tolerance = 1.0e-10  !1.0e-10
+  Steady State Convergence Tolerance = 1.0e-4
+
+! This refers to actually whether there is another solver 
+! moving the mesh. If this is the only solver, then set False. 
+  Moving Mesh = Logical False
+  Compute Mesh Velocity = Logical False
+
+! Add displacement cumulatively
+  Cumulative Displacement = Logical True
+End
+
+
+Solver 3
+  Equation = "AdvDiff"
+  Procedure = "AdvectionDiffusion" "AdvectionDiffusionSolver"
+  Variable = String "Gas"
+  Bubbles = True
+
+! For now consider steady state diffusion. 
+! This could be made transient but that introduces
+! initial fast ramp-up that make it more difficult 
+! to find convergent solution. 
+  Time Derivative Active = False
+
+  Linear System Convergence Tolerance =1.0E-10  !1.0E-10
+  Linear System Solver = "Iterative"
+  Linear System Iterative Method = "BiCGStabl"
+  BiCgstabl Polynomial Degree = Integer 2
+  Linear System Max Iterations = 1000
+  Linear System Preconditioning = ILU0
+  Linear System Residual Output = 0
+
+  Nonlinear System Max Iterations = 1
+  Nonlinear System Convergence Tolerance = 1.0e-5
+  Steady State Convergence Tolerance =  1.0e-06
+
+  Calculate Loads = Logical True
+
+  Exported Variable 1 = -global totflux
+  Exported Variable 2 = -global totarea
+End
+
+
+
+Solver 4
+! We need to compute the normal of the surface as this is used
+! to upated the geometry. This uses the Galerkin method to do that.
+  Exec Solver = "before all"
+  
+  Equation = ComputeNormals
+  Procedure = "NormalSolver" "NormalSolver"
+
+  Variable = -nooutput nrm_temp
+  Exported Variable 1 = Normals[normals:2]
+  Normals Result Variable = String "Normals"
+
+  Linear System Solver = "Iterative"
+  Linear System Iterative Method = "BiCGStab"
+  Linear System Preconditioning = None
+  Linear System Residual Output = 0
+  Linear System Max Iterations = 1000
+  Linear System Convergence Tolerance = 1.0e-10
+End
+
+
+Material 1
+  Name = "Ideal Fluid"
+  Density = 6956
+  Gas Diffusivity = Real 3.262e-9    !Einstein-Stokes Equation 
+!  Mesh Elastic Modulus = Variable "Gas"
+!   Real
+!     0.0 1.0
+!     0.7 1.0
+!     0.9 0.01 
+!     1.0 0.01 
+!   End 
+End
+
+
+! This is not really physically present
+! It is just a storage room for the air. 
+Material 2
+  Name = "Ideal Bubble"
+End
+
+Boundary Condition 1
+  Name = "Top"
+  Target Boundaries(1) = 4
+
+  Gas = Real $ extcons
+  MeshU 1 = Real 0.0
+  MeshU 2 = Real 0.0
+End
+
+Boundary Condition 2
+  Name = "Right"
+  Target Boundaries(1) = 3
+
+  Gas = Real $ extcons
+  MeshU 1 = Real 0.0
+  MeshU 2 = Real 0.0
+End
+
+
+Boundary Condition 3
+  Name = "Bottom"
+  Target Boundaries(1) = 1
+
+  Gas = Real $ extcons
+  MeshU 1 = Real 0.0
+  MeshU 2 = Real 0.0
+End
+
+Boundary Condition 4
+  Name = "Fluid Symmetry"
+  Target Boundaries(2) = 2 5
+
+  MeshU 1 = Real 0.0
+End
+
+!Boundary Condition 5
+  !Name = "Bubble Symmetry"
+  !Target Boundaries(1) = 3
+
+  !MeshU 1 = Real 0.0
+!End
+
+Boundary Condition 5
+  Name = "Bubble-Fluid Interface"
+  Target Boundaries(1) = 6
+
+! This is given body index as the normals are solved for this
+  Body Id = 3
+
+! Normals point towards fluid
+  Normal Target Body = 1
+
+  Save Scalars = True
+  $expconst = 1.27e-4	!6.38688e-5
+! Robin BCs for the flux
+  Mass Transfer Coefficient = Variable totarea, time
+  Real MATC "sqrt(8.459*tx(0)/(1+tx(1)))" 
+    !Real MATC "0.5*(0.000005+tx(0))*pow((1+0.5*pow((0.000005+tx(0)),1.33)),0.75)"  ! Surface Renewal Theory
+  External Concentration = Variable MeshU 
+    Real MATC "expconst*sqrt(101325+560000/(10+tx(0)))"   !The first term relates to Gibbs free energy - its value makes the difference
+!pgas=patm+2*sigma*f(beta)/R, where f(beta)=0.5  
+!External Concentration = 0.005055
+
+! Geometry is assumed to grow in normal direction and be propotional 
+! to the flux. 
+  MeshU 1 = Variable "Normals 1, totflux, totarea, timestep size"
+    Real MATC "-tx(0)*tx(1)*tx(3)/tx(2)"
+  MeshU 2 = Variable "Normals 2, totflux, totarea, timestep size"
+    Real MATC "-tx(0)*tx(1)*tx(3)/tx(2)"
+End
+
