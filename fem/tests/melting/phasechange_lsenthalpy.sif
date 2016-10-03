@@ -2,7 +2,7 @@
     !Phase change solid-liquid
     ! [/code]
     ! Compute transient solid liquid phase change with enthalpy formulation for Sn-0.7Cu
-    !By: Julien Gilvernaud (2015-03-19) and Modification by Anil Kunwar (2016-06-02)
+    !By: For Silicon Melting by Julien Gilvernaud (2015-03-19) and Modification for Solders by Anil Kunwar (2016-06-02)
 
     Header
       CHECK KEYWORDS Warn
