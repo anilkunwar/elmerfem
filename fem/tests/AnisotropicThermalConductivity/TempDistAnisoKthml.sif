@@ -1,4 +1,5 @@
 !echo on
+!The thermal conductivity tensor is varied along the coordinate length.
 
 Header
   CHECK KEYWORDS Warn
