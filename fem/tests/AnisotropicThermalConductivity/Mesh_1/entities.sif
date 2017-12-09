@@ -1,0 +1,30 @@
+!------ Skeleton for body section -----
+Body 1
+  Name = Extrusion_1
+End
+
+!------ Skeleton for boundary section -----
+Boundary Condition 1
+  Name = Face_2left
+End
+
+Boundary Condition 2
+  Name = Face_3front
+End
+
+Boundary Condition 3
+  Name = Face_4bottom
+End
+
+Boundary Condition 4
+  Name = Face_5top
+End
+
+Boundary Condition 5
+  Name = Face_6back
+End
+
+Boundary Condition 6
+  Name = Face_7right
+End
+

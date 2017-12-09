@@ -1,0 +1,9 @@
+! ----- names for bodies -----
+$ Extrusion_1 = 1
+! ----- names for boundaries -----
+$ Face_2left = 1
+$ Face_3front = 2
+$ Face_4bottom = 3
+$ Face_5top = 4
+$ Face_6back = 5
+$ Face_7right = 6
