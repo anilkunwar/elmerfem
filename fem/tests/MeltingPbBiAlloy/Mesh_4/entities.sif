@@ -1,0 +1,17 @@
+!------ Skeleton for body section -----
+Body 1
+  Name = Cylinder_1
+End
+
+!------ Skeleton for boundary section -----
+Boundary Condition 1
+  Name = Face_1left
+End
+
+Boundary Condition 2
+  Name = Face_2curve
+End
+
+Boundary Condition 3
+  Name = Face_3right
+End
