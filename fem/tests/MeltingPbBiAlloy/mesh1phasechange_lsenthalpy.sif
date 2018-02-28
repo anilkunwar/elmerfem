@@ -1,0 +1,277 @@
+
+    !Phase change solid-liquid
+    ! [/code]
+    ! Compute transient solid liquid phase change with enthalpy formulation for Sn-589Bi/Sn3.5Ag0.5Cu 7
+    !By: Peter Raback, Julien Givernaud and Anil Kunwar (2016-10-03)
+    ! Finer Mesh (Mesh_&7 for grid independence test for larger geometry)
+
+    Header
+      CHECK KEYWORDS Warn
+      !Mesh DB "." "Mesh_1"
+      !Mesh DB "." "Mesh_2"
+      !Mesh DB "." "Mesh_3"
+      Mesh DB "." "Mesh_4"  !Ultra-fine mesh
+      !Mesh DB "." "Mesh_5"
+      !Mesh DB "." "Mesh_6"
+      !Mesh DB "." "Mesh_7"
+      !Mesh DB "." "Mesh_8"
+      !Mesh DB "." "Mesh_9"
+      !Mesh DB "." "slab"
+      Include Path ""
+      Results Directory "."
+    End
+
+    ! beta = 2*2.0e-4 ! 2*pulse duration
+   $ function coeffsqwave(x) {a=1.960e8 ; pye=3.1416; beta=4.2e-4; _coeffsqwave=a*(4/pye)*( sin(1*2*pye*x/beta) + 0.33*sin(3.0*2*pye*x/beta) + 0.20*sin(5.0*2*pye*x/ beta) + 0.14*sin(7.0*2*pye*x/beta) + 0.11*sin(9.0*2*pye*x/beta) + 0.091*sin(11.0*2*pye*x/beta) + 0.076*sin(13.0*2*pye*x/beta) + 0.067*sin(15.0*2*pye*x/beta) )} !3W big balls solder heating case
+
+    Simulation
+      Max Output Level = 5
+      Coordinate System = Cartesian 3D
+      Coordinate Mapping(3) = 1 2 3
+      Coordinate Scaling = 1.0e-2 !Dimensions are in cm
+      Simulation Type = Transient
+      Steady State Max Iterations = 2 !2 !20 !500 !20
+      Output Intervals (1) = 10 !Output after each 100 s 10 s
+      Timestep intervals (1) = 2000 !20 s
+      Timestep Sizes (1) = 0.1 !01 1.0e-2
+      Timestepping Method = BDF
+      BDF Order = 2
+      Solver Input File = mesh1phasechange_lsenthalpy.sif
+      Post File = "a.vtu"
+      Use Mesh Names = True
+    End
+
+    Constants
+      Gravity(4) = 0 -1 0 9.82
+      Stefan Boltzmann = 5.67e-08
+      Permittivity of Vacuum = 8.8542e-12
+      Boltzmann Constant = 1.3807e-23
+      Unit Charge = 1.602e-19
+    End
+
+    Body 1
+      !Target Bodies(1) = 2
+      Name = "Cylinder_1" !UpperLiquid
+      Equation = 1
+      Material = 1
+      Body Force = 1
+      Initial condition = 1
+    End
+
+    
+    Solver 1
+      Equation = Heat Equation
+      Procedure = "HeatSolve" "HeatSolver"
+      Calculate Loads = True
+      Variable = Temperature
+      Exec Solver = Always
+      Stabilize = True
+      Bubbles = False
+      Lumped Mass Matrix = False
+      Optimize Bandwidth = True
+      Steady State Convergence Tolerance = 5.0e-7
+      Nonlinear System Convergence Tolerance = 1.0e-7
+      Nonlinear System Max Iterations = 20
+      Nonlinear System Newton After Iterations = 3
+      Nonlinear System Newton After Tolerance = 1.0e-3
+      Nonlinear System Relaxation Factor = 1
+      Linear System Solver = Iterative
+      Linear System Iterative Method = BiCGStab !BiCGStabl
+      BiCGstabl polynomial degree = 10
+      Linear System Max Iterations = 500
+      Linear System Convergence Tolerance = 1.0e-5 !1.0e-5 1.0e-10 1.0e-4
+      Linear System Preconditioning = ILU0
+      Linear System ILUT Tolerance = 1.0e-3
+      Linear System Abort Not Converged = False
+      Linear System Residual Output = 1
+      Linear System Precondition Recompute = 1
+      !Linear System Solver = Direct
+      !Linear System Direct Method = UMFPack
+      !Steady State Convergence Tolerance = 1.0e-4
+    End
+
+    Solver 2
+      Equation = Navier-Stokes
+      Variable = Flow Solution[Velocity:3 Pressure:1]
+      Procedure = "FlowSolve" "FlowSolver"
+      Calculate Loads = True
+      Exec Solver = Always
+      Stabilize = True
+      Bubbles = False
+      Lumped Mass Matrix = False
+      Optimize Bandwidth = True
+      Steady State Convergence Tolerance = 5.0e-7
+      Nonlinear System Convergence Tolerance = 1.0e-7 !1.0e-7
+      Nonlinear System Max Iterations = 20
+      Nonlinear System Newton After Iterations = 3
+      Nonlinear System Newton After Tolerance = 1.0e-3
+      Nonlinear System Relaxation Factor = 0.5 !1
+      Linear System Solver = Iterative
+      Linear System Iterative Method = BiCGStab !BiCGStabl
+      !BiCGstabl polynomial degree = 10
+      Linear System Max Iterations = 500
+      Linear System Convergence Tolerance = 1.0e-5  !1.0e-10 1.0e-10 increased tolerance owing to greater velocity as the SAC solder has low Tm temperature
+      Linear System Preconditioning = ILU0
+      Linear System ILUT Tolerance = 1.0e-3
+      Linear System Abort Not Converged = False
+      Linear System Residual Output = 1
+      Linear System Precondition Recompute = 1
+      !Linear System Solver = Direct
+      !Linear System Direct Method = UMFPack
+      !Steady State Convergence Tolerance = 1.0e-4
+    End
+    
+    Solver 3
+    Exec Solver = never
+    Equation = SaveLine
+    Procedure = "SaveData" "SaveLine"
+    Filename = f.dat
+    End
+
+    !Solver 4
+      !Equation = Result Output
+      !Save Geometry Ids = True
+      !Output Format = Vtu
+      !Vtu Format = Logical True
+      !Procedure = "ResultOutputSolve" "ResultOutputSolver"
+      !Output File Name = Melting_front !comp_elmer_comsol
+      !Scalar Field 1 = Temperature loads
+      !Scalar Field 2 = Temperature
+      !Scalar Field 4 = Pressure
+      !Vector Field 1 = Velocity
+      !Single Precision = True
+      !Exec Solver = After saving
+    !End
+
+    Equation 1
+      Name = "Equation 1"
+      Phase Change Model = Spatial 2
+      Check Latent Heat Release = True
+      Convection = Computed
+      Navier-Stokes = True
+      NS Convect = True
+      Active Solvers(2) = 1 2  ! 3 4
+    End
+
+    Material 1
+      Name = "Pb-Bi Eutectic"
+      Reference Temperature = 298
+      !!!!!!!!!!!!!!!!!table for the viscosity!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !Viscosity = Variable Temperature
+    	!Real
+      	!include mu_snagcu.dat
+    	!End
+      Viscosity = Variable Temperature
+      Procedure "getViscosity" "getViscosity"
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Material Properties!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      reference viscosity = Real 4.94e-4 !PaS
+      Activation Energy = Real 6270.0 
+      Tm-rho = Real 397.9
+      Ts-rho = Real 396.0 
+      !!!!!!volume expansion coefficient for Boussinesq Approximation!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      Heat expansion Coefficient = 6.9e-5!length expansion coefficient (CTE) = 23.24e-6 H.M.Jin & p. Wu 2002
+      !!!!!!!!!!!!!!!!!table for the enthalpy!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      Specific Enthalpy = Variable Temperature
+    Real
+      include specific_h_pbbi.dat
+    End
+      Phase Change Intervals(2,1) = 396.1 400.0
+      Compressibility Model = Incompressible
+      Reference Pressure = 0
+      !Reference Temperature = Real 298
+      Specific Heat Ratio = 1.4
+      !!!!!!!!!!!!!!UDF for Thermal Conductivity!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
+      !Heat Conductivity = 73.2
+      Heat Conductivity = Variable Temperature
+      Procedure "geThermalConductivity" "getThermalConductivity"
+      Melting Point Temperature = Real 397.9  !will use Tm-rho however in the UDF
+      Constant term = Real 3.61 
+      Term B = Real 1.57e-02
+      Term C = Real -1.741e-06
+      !Tm-rho = 397.9 !defined above
+      Heat Capacity = Real 295
+      !!!!!!!!!!!!!!!!!!!!!!User defined function for density!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !Density = 7093.926
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Density as a function of temperature UDF!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      Density = Variable Temperature
+      Procedure "getDensity" "getDensity"
+      CoeffA = Real 10524.6
+      CoeffB =  Real 1.3571
+      Coeffc = Real 1.69e-04
+      !Tm-rho = 397.9 !defined above
+    End
+
+    
+    Body Force 1
+      Name = "Natural convection"
+      Boussinesq = True
+    End
+
+    Initial Condition 1
+      Name = "InitialCondition 1"
+      Velocity 2 = 0
+      Pressure = 0
+      Velocity 1 = 0
+      Velocity 2 = 0
+      Velocity 3 = 0
+      Temperature = 298.00
+      !Concentration = 0.0
+    End
+
+   
+    Boundary Condition 1
+     Name = "Face_2curve"
+     !Target Boundaries(1) = 2
+      External Temperature = 410 !404.00
+      ! Heat Transfer Coefficient = 15
+      Heat Transfer Coefficient = Variable Temperature
+      Real MATC "11500*pow(tx,-0.03)"   !emissivity = 1.0 lowered interfacial heat transfer coefficient
+      Noslip wall BC = True
+      !Temperature = 401.15 !K
+      Save Scalars = Logical True
+      !Normal-Tangential Velocity = Logical True
+ 	! Velocity 1 = Real -0.0001
+ 	! Velocity 2 = Real 0.0   
+    End
+
+    !Boundary Condition 2
+     !Name = "Face_curvedsurfball4"
+     !Target Boundaries(1) = 4
+      !External Temperature = 463.15 !190.00 degree centigrade
+      !Heat Transfer Coefficient = 15
+      !Noslip wall BC = True
+      !Save Scalars = Logical True
+      !Temperature = 298.0
+      !Concentration = 1.59e-3 #mol/cc
+     !Normal-Tangential Velocity = Logical True
+ 	! Velocity 1 = Real -0.0001
+ 	 !Velocity 2 = Real 0.0
+    !End
+
+    Boundary Condition 2
+     Name = "Face_1left Face_3right"
+     !Target Boundaries(2) = 1 3
+      !External Temperature = 463.15 !190.00 degree centigrade
+      !Heat Transfer Coefficient = 15
+      !Noslip wall BC = True
+      !Save Scalars = Logical True
+      !Temperature = 298.0
+      !Concentration = 1.59e-3 #mol/cc
+      !Normal-Tangential Velocity = Logical True
+ 	 !Velocity 1 = Real -0.0001
+ 	 !Velocity 2 = Real 0.0
+      pressure = 0.0   
+    End
+
+
+    !Boundary Condition 2
+    !Name = "Face_curvedsurfball4"
+    !Target Boundaries(1) = 3
+    !Heat Flux = Variable time
+    !Real Procedure "RectilinearHeatSource" "TravellingHeatSource"
+    !Save Line = True
+    !Concentration =   5.73892903E-04 #mol/cc 0.0000 This is due to the initial concentration of Cu in the mixture
+    !Temperature = 463.15 !190.00 degree centigrade
+    !End
+
+  
