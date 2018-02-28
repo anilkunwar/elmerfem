@@ -218,7 +218,8 @@
       !Concentration = 0.0
     End
 
-   
+    !!!!!!!!!!!!!!For time varying heat source modeling, define external temperature as a function of time in MATC
+    !!!!!!!!!!!!!!!!!expressions
     Boundary Condition 1
      Name = "Face_2curve"
      !Target Boundaries(1) = 2
