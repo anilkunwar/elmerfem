@@ -225,7 +225,8 @@
       External Temperature = 410 !404.00
       ! Heat Transfer Coefficient = 15
       Heat Transfer Coefficient = Variable Temperature
-      Real MATC "11500*pow(tx,-0.03)"   !emissivity = 1.0 lowered interfacial heat transfer coefficient
+      Real MATC "10000*pow(tx,-0.03)"   !11500 emissivity = 1.0 higher interfacial heat transfer coefficient
+      !Real MATC "1000*pow(tx,-0.03)"   !800 emissivity = 1.0 lowered interfacial heat transfer coefficient
       Noslip wall BC = True
       !Temperature = 401.15 !K
       Save Scalars = Logical True
