@@ -1,4 +1,4 @@
-    SUBROUTINE getConductivity( model, n, dummyArgument,Conductivity )
+    SUBROUTINE getConductivity( model, n, t, Conductivity )
     ! modules needed
     USE DefUtils
 
@@ -7,16 +7,18 @@
     ! variables in function header
     TYPE(Model_t) :: model
     INTEGER :: n
-    REAL(KIND=dp) :: dummyArgument
+    !REAL(KIND=dp) :: dummyArgument
+     REAL(KIND=dp) :: t
 
     ! variables needed inside function
     INTEGER :: DIM
     REAL(KIND=dp) :: x, y,z
-    REAL(KIND=dp),POINTER ::  Conductivity(:,:)
+    REAL(KIND=dp),POINTER ::  Conductivity(:,:) ! this size needs to be consistent with the sif file!
     !REAL(KIND=dp) :: lambda, beta
     REAL,PARAMETER :: lambda=34.2
     REAL,PARAMETER :: beta=10.0
     Logical :: FirstVisited = .TRUE.
+     PRINT *,'size',t,SIZE(Conductivity)
 
     ! remember these variables
     SAVE DIM, FirstVisited
@@ -25,8 +27,8 @@
     y = model % Nodes % y(n)
     z = model % Nodes % z(n)
 
-
-    Conductivity = 0.0D00
+    
+    !Conductivity = 0.0D00
     Conductivity(1,1) = lambda
     Conductivity(1,2) = 0.0D00
     Conductivity(1,3) = lambda*(beta*y)/(x*x+y*y+0.00005)
