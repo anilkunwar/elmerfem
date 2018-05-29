@@ -181,9 +181,9 @@ End
 Boundary Condition 1
   !Target Boundaries(1) = 4 !Anode
   Name = "left"
-  !Potential = 5.0
-  Current Density BC = Logical True
-  Current Density = Real  51.301 !310 A/m^2 Determination from Butler Volmer kinetics/ Experimental Measurement
+  Potential = 5.0
+  !Current Density BC = Logical True
+  !Current Density = Real  51.301 !310 A/m^2 Determination from Butler Volmer kinetics/ Experimental Measurement
   Temperature = 298 !303
   Concentration = 5.51e-5 !mol/L 2.113e-3  kg/m^3 measured from ion chromatography
   Noslip wall BC = True
