@@ -180,9 +180,9 @@ End
 Boundary Condition 1
   !Target Boundaries(1) = 4 !Anode
   Name = "left"
-  !Potential = 3.0
-  Current Density BC = Logical True
-  Current Density = Real 31.714 !150 A/m^2 Determination from Butler Volmer kinetics  
+  Potential = 3.0
+  !Current Density BC = Logical True
+  !Current Density = Real 31.714 !150 A/m^2 Determination from Butler Volmer kinetics  
   ! Ekilik2000, Amorim2007, Steigerwald1962, He2014, Potentiostat measurements
   Temperature = 298 !303
   Concentration =  7.5e-6 !mol/L He2014 2.113e-3 kg/m^3 measured from ion chromatography (not used)
