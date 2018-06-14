@@ -1,0 +1,9 @@
+! ----- names for bodies -----
+$ solder_volume = 1
+! ----- names for boundaries -----
+$ leftFace = 1
+$ frontFace = 2
+$ bottomFace = 3
+$ topFace = 4
+$ backFace = 5
+$ rightFace = 6
