@@ -30,6 +30,7 @@ End
 Solver 1
   Equation = Elasticity Solver
   Variable = Displacement
+  Element="p:2 b:1" !p=2 implied quadratic finite elements
   Variable DOFs = 2
   Procedure = "ElasticSolve" "ElasticSolver"
   Linear System Solver = Iterative
