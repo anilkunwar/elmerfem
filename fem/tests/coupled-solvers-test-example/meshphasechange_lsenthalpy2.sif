@@ -27,7 +27,7 @@
       Timestep Sizes (1) = 2.5e-03 !2.50e-7 
       Timestepping Method = BDF
       BDF Order = 2
-      Solver Input File = mesh1phasechange_lsenthalpy.sif
+      Solver Input File = meshphasechange_lsenthalpy2.sif
       Post File = "a.vtu"
       Use Mesh Names = True
       ! Parameters for the TravellingHeatSource
