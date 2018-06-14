@@ -19,7 +19,7 @@
       Max Output Level = 5
       Coordinate System = Cartesian
       Coordinate Mapping(3) = 1 2 3
-      Coordinate Scaling = 1.0e-2 !1.0e-4 !converges when this is 1.0e-3 For changing 180 um, to 200 um cube = 200/180-2
+      Coordinate Scaling = 1.0e-2 !1.0e-4 !change this in accordance to the scale of geometry
       Simulation Type = Transient
       Steady State Max Iterations = 2 !2 !20 !500 !20
       Output Intervals (1) = 100  
