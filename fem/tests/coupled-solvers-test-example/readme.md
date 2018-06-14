@@ -1,1 +1,1 @@
-#This test couples heat and mass transfer solvers
+#This test couples heat transfer and fluid flow
