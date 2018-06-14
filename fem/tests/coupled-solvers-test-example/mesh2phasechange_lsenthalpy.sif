@@ -19,12 +19,12 @@
       Max Output Level = 5
       Coordinate System = Cartesian
       Coordinate Mapping(3) = 1 2 3
-      Coordinate Scaling = 1.0e-4 !1.0e-4 !converges when this is 1.0e-3 For changing 180 um, to 200 um cube = 200/180-2
+      Coordinate Scaling = 1.0e-2 !1.0e-4 !converges when this is 1.0e-3 For changing 180 um, to 200 um cube = 200/180-2
       Simulation Type = Transient
       Steady State Max Iterations = 2 !2 !20 !500 !20
-      Output Intervals (1) = 1 
+      Output Intervals (1) = 100  
       Timestep intervals (1) = 800 
-      Timestep Sizes (1) = 2.50e-7 
+      Timestep Sizes (1) = 2.5e-03 !2.50e-7 
       Timestepping Method = BDF
       BDF Order = 2
       Solver Input File = mesh1phasechange_lsenthalpy.sif
