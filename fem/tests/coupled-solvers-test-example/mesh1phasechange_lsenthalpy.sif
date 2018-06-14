@@ -6,8 +6,9 @@
 
     Header
       CHECK KEYWORDS Warn
-       !Mesh DB "." "Mesh_1"
-       Mesh DB "." "Mesh_2"
+       Mesh DB "." "Mesh_1"
+       !Mesh DB "." "Mesh_2"
+       !Mesh DB "." "Mesh_4"
       !Mesh DB "." "slab"
       Include Path " "
       Results Directory "."
@@ -17,12 +18,13 @@
       Max Output Level = 5
       Coordinate System = Cartesian
       Coordinate Mapping(3) = 1 2 3
-      Coordinate Scaling = 1.0e-4 !1.0e-4 !converges when this is 1.0e-3 For changing 180 um, to 200 um cube = 200/180-2
+      Coordinate Scaling = 1.0e-2 !1.0e-4 !make larger for better convergence and 
+      ! when making smaller for laser soldering, need to adjust timestep size nearly equal to coordinate scaling
       Simulation Type = Transient
       Steady State Max Iterations = 2 !2 !20 !500 !20
-      Output Intervals (21) = 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1   
-      Timestep intervals (21) = 200 1 200 1 200 1 200 1 200 1 200 1 200 1 200 1 200 1 200 1 200  !100
-      Timestep Sizes (21) = 1.0e-6 2.4e-2 1.0e-6 2.4e-2 1.0e-6 2.4e-2 1.0e-6 2.4e-2 1.0e-6 2.4e-2 1.0e-6 2.4e-2 1.0e-6 2.4e-2 1.0e-6 2.4e-2 1.0e-6 2.4e-2 1.0e-6 2.4e-2 1.0e-6!5
+      Output Intervals (2) = 1 1   
+      Timestep intervals (2) = 1 200 !100
+      Timestep Sizes (2) = 1.0e-02 1.0e-04!5
       Timestepping Method = BDF
       BDF Order = 2
       Solver Input File = mesh1phasechange_lsenthalpy.sif
@@ -181,7 +183,7 @@
       !!!!!!!!!!!!!!UDF for Thermal Conductivity!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
       !Heat Conductivity = 73.2
       Heat Conductivity = Variable Temperature
-      Procedure "geThermalConductivity" "getThermalConductivity"
+      Procedure "getThermalConductivity" "getThermalConductivity"
       Melting Point Temperature = Real 490.0
       Reference Thermal Conductivity B = Real 60.054 !88.9342 N. Aksoz et al. 2013
       Slope A = Real -0.009 !-0.0602857 
