@@ -1,0 +1,29 @@
+!------ Skeleton for body section -----
+Body 1
+  Name = solder_volume
+End
+
+!------ Skeleton for boundary section -----
+Boundary Condition 1
+  Name = leftFace
+End
+
+Boundary Condition 2
+  Name = frontFace
+End
+
+Boundary Condition 3
+  Name = bottomFace
+End
+
+Boundary Condition 4
+  Name = topFace
+End
+
+Boundary Condition 5
+  Name = backFace
+End
+
+Boundary Condition 6
+  Name = rightFace
+End
