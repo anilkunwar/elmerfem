@@ -1,4 +1,6 @@
-!echo on
+! A good example on using the function to support MATC expression with longer character length (than 128)
+! By default MATC length is limited to 128 characters
+! echo on
 !The thermal conductivity tensor is varied along the coordinate length.
 
 Header
